@@ -4,7 +4,6 @@ import json
 import glob
 import time
 import RPi.GPIO as io
-import thread
 from ISStreamer.Streamer import Streamer
 from sense_hat import SenseHat 
 
