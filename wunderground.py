@@ -65,6 +65,7 @@ def moon_icon(moon_phase):
 		"First Quarter"   : ":first_quarter_moon:",
 		"Waxing Gibbous"  : ":waxing_gibbous_moon:",
 		"Full Moon"       : ":full_moon:",
+		"Full"            : ":full_moon:",
 		"Waning Gibbous"  : ":waning_gibbous_moon:",
 		"Last Quarter"    : ":last_quarter_moon:",
 		"Waning Crescent" : ":waning_crescent_moon:",
