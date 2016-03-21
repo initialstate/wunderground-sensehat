@@ -16,6 +16,7 @@ BUCKET_NAME = ":partly_sunny: " + CITY + " Weather"
 BUCKET_KEY = "shwu1"
 ACCESS_KEY = "PLACE YOUR INITIAL STATE ACCESS KEY HERE"
 MINUTES_BETWEEN_READS = 15
+METRIC_UNITS = False
 # ---------------------------------
 
 def isFloat(string):
@@ -134,8 +135,15 @@ def main():
 	sense = SenseHat()
 	conditions = get_conditions()
 	astronomy = get_astronomy()
-	streamer = Streamer(bucket_name=BUCKET_NAME, bucket_key=BUCKET_KEY, access_key=ACCESS_KEY)
-	streamer.log(":house: Location",conditions['current_observation']['display_location']['full'])
+	if ('current_observation' not in conditions) or ('moon_phase' not in astronomy):
+		print "Error! Wunderground API call failed, check your STATE and CITY and make sure your Wunderground API key is valid!"
+		if 'error' in conditions['response']:
+			print "Error Type: " + conditions['response']['error']['type']
+			print "Error Description: " + conditions['response']['error']['description']
+		exit()
+	else:
+		streamer = Streamer(bucket_name=BUCKET_NAME, bucket_key=BUCKET_KEY, access_key=ACCESS_KEY)
+		streamer.log(":house: Location",conditions['current_observation']['display_location']['full'])
 	while True:
 		# -------------- Sense Hat --------------
 		# Read the sensors
@@ -146,22 +154,32 @@ def main():
 		# Format the data
 		temp_f = temp_c * 9.0 / 5.0 + 32.0
 		temp_f = float("{0:.2f}".format(temp_f))
+		temp_c = float("{0:.2f}".format(temp_c))
 		humidity = float("{0:.2f}".format(humidity))
 		pressure_in = 0.0295301*(pressure_mb)
 		pressure_in = float("{0:.2f}".format(pressure_in))
+		pressure_mb = float("{0:.2f}".format(pressure_mb))
 
 		# Print and stream 
-		print SENSOR_LOCATION_NAME + " Temperature(F): " + str(temp_f)
+		if (METRIC_UNITS):
+			print SENSOR_LOCATION_NAME + " Temperature(C): " + str(temp_c)
+			print SENSOR_LOCATION_NAME + " Pressure(mb): " + str(pressure_mb)
+			streamer.log(":sunny: " + SENSOR_LOCATION_NAME + " Temperature(C)", temp_c)
+			streamer.log(":cloud: " + SENSOR_LOCATION_NAME + " Pressure (mb)", pressure_mb)
+		else:
+			print SENSOR_LOCATION_NAME + " Temperature(F): " + str(temp_f)
+			print SENSOR_LOCATION_NAME + " Pressure(IN): " + str(pressure_in)
+			streamer.log(":sunny: " + SENSOR_LOCATION_NAME + " Temperature(F)", temp_f)
+			streamer.log(":cloud: " + SENSOR_LOCATION_NAME + " Pressure (IN)", pressure_in)
 		print SENSOR_LOCATION_NAME + " Humidity(%): " + str(humidity)
-		print SENSOR_LOCATION_NAME + " Pressure(IN): " + str(pressure_in)
-		streamer.log(":sunny: " + SENSOR_LOCATION_NAME + " Temperature(F)", temp_f)
 		streamer.log(":sweat_drops: " + SENSOR_LOCATION_NAME + " Humidity(%)", humidity)
-		streamer.log(":cloud: " + SENSOR_LOCATION_NAME + " Pressure (IN)", pressure_in)
 
 		# -------------- Wunderground --------------
 		conditions = get_conditions()
 		astronomy = get_astronomy()
-		if ((conditions != False) and (astronomy != False)):
+		if ('current_observation' not in conditions) or ('moon_phase' not in astronomy):
+			print "Error! Wunderground API call failed. Skipping a reading then continuing ..."
+		else:
 			humidity_pct = conditions['current_observation']['relative_humidity']
 			humidity = humidity_pct.replace("%","")
 
@@ -169,24 +187,40 @@ def main():
 			streamer.log(":cloud: " + CITY + " Weather Conditions",weather_status_icon(conditions, astronomy))
 			streamer.log(":crescent_moon: Moon Phase",moon_icon(astronomy['moon_phase']['phaseofMoon']))
 			streamer.log(":dash: " + CITY + " Wind Direction",wind_dir_icon(conditions, astronomy))
-			if isFloat(conditions['current_observation']['temp_f']): 
-				streamer.log(CITY + " Temperature(F)",conditions['current_observation']['temp_f'])
-			if isFloat(conditions['current_observation']['dewpoint_f']):
-				streamer.log(CITY + " Dewpoint(F)",conditions['current_observation']['dewpoint_f'])
-			if isFloat(conditions['current_observation']['wind_mph']):
-				streamer.log(":dash: " + CITY + " Wind Speed(MPH)",conditions['current_observation']['wind_mph'])
-			if isFloat(conditions['current_observation']['wind_gust_mph']):
-				streamer.log(":dash: " + CITY + " Wind Gust(MPH)",conditions['current_observation']['wind_gust_mph'])
-			if isFloat(humidity):
-				streamer.log(":droplet: " + CITY + " Humidity(%)",humidity)
-			if isFloat(conditions['current_observation']['pressure_in']):
-				streamer.log(CITY + " Pressure(IN)",conditions['current_observation']['pressure_in'])
-			if isFloat(conditions['current_observation']['precip_1hr_in']):
-				streamer.log(":umbrella: " + CITY + " Precip 1 Hour(IN)",conditions['current_observation']['precip_1hr_in'])
-			if isFloat(conditions['current_observation']['precip_today_in']):
-				streamer.log(":umbrella: " + CITY + " Precip Today(IN)",conditions['current_observation']['precip_today_in'])
+			if (METRIC_UNITS):
+				if isFloat(conditions['current_observation']['temp_c']): 
+					streamer.log(CITY + " Temperature(C)",conditions['current_observation']['temp_c'])
+				if isFloat(conditions['current_observation']['dewpoint_c']):
+					streamer.log(CITY + " Dewpoint(C)",conditions['current_observation']['dewpoint_c'])
+				if isFloat(conditions['current_observation']['wind_kph']):
+					streamer.log(":dash: " + CITY + " Wind Speed(KPH)",conditions['current_observation']['wind_kph'])
+				if isFloat(conditions['current_observation']['wind_gust_kph']):
+					streamer.log(":dash: " + CITY + " Wind Gust(KPH)",conditions['current_observation']['wind_gust_kph'])
+				if isFloat(conditions['current_observation']['pressure_mb']):
+					streamer.log(CITY + " Pressure(mb)",conditions['current_observation']['pressure_mb'])
+				if isFloat(conditions['current_observation']['precip_1hr_metric']):
+					streamer.log(":umbrella: " + CITY + " Precip 1 Hour(mm)",conditions['current_observation']['precip_1hr_metric'])
+				if isFloat(conditions['current_observation']['precip_today_metric']):
+					streamer.log(":umbrella: " + CITY + " Precip Today(mm)",conditions['current_observation']['precip_today_metric'])
+			else:
+				if isFloat(conditions['current_observation']['temp_f']): 
+					streamer.log(CITY + " Temperature(F)",conditions['current_observation']['temp_f'])
+				if isFloat(conditions['current_observation']['dewpoint_f']):
+					streamer.log(CITY + " Dewpoint(F)",conditions['current_observation']['dewpoint_f'])
+				if isFloat(conditions['current_observation']['wind_mph']):
+					streamer.log(":dash: " + CITY + " Wind Speed(MPH)",conditions['current_observation']['wind_mph'])
+				if isFloat(conditions['current_observation']['wind_gust_mph']):
+					streamer.log(":dash: " + CITY + " Wind Gust(MPH)",conditions['current_observation']['wind_gust_mph'])
+				if isFloat(conditions['current_observation']['pressure_in']):
+					streamer.log(CITY + " Pressure(IN)",conditions['current_observation']['pressure_in'])
+				if isFloat(conditions['current_observation']['precip_1hr_in']):
+					streamer.log(":umbrella: " + CITY + " Precip 1 Hour(IN)",conditions['current_observation']['precip_1hr_in'])
+				if isFloat(conditions['current_observation']['precip_today_in']):
+					streamer.log(":umbrella: " + CITY + " Precip Today(IN)",conditions['current_observation']['precip_today_in'])
 			if isFloat(conditions['current_observation']['solarradiation']):
 				streamer.log(":sunny: " + CITY + " Solar Radiation (watt/m^2)",conditions['current_observation']['solarradiation'])
+			if isFloat(humidity):
+				streamer.log(":droplet: " + CITY + " Humidity(%)",humidity)
 			if isFloat(conditions['current_observation']['UV']):
 				streamer.log(":sunny: " + CITY + " UV Index:",conditions['current_observation']['UV'])
 			streamer.flush()
