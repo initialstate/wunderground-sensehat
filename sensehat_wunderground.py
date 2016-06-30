@@ -32,7 +32,7 @@ def get_conditions():
 	  	f = urllib2.urlopen(api_conditions_url)
 	except:
 		print "Failed to get conditions"
-		return False
+		return None
 	json_conditions = f.read()
 	f.close()
 	return json.loads(json_conditions)
@@ -43,7 +43,7 @@ def get_astronomy():
 		f = urllib2.urlopen(api_astronomy_url)
 	except:
 		print "Failed to get astronomy"
-		return False		
+		return None		
 	json_astronomy = f.read()
 	f.close()
 	return json.loads(json_astronomy)
