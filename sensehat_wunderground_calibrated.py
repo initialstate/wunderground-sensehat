@@ -151,16 +151,16 @@ def main():
 		temp_c = sense.get_temperature()
 		humidity = sense.get_humidity() 
 		pressure_mb = sense.get_pressure() 
-    cpu_temp = subprocess.check_output("vcgencmd measure_temp", shell=True)
-    array = cpu_temp.split("=")
-    array2 = array[1].split("'")
+    		cpu_temp = subprocess.check_output("vcgencmd measure_temp", shell=True)
+    		array = cpu_temp.split("=")
+    		array2 = array[1].split("'")
 
-    cpu_tempc = float(array2[0])
-    cpu_tempc = float("{0:.2f}".format(cpu_tempc))
-    cpu_tempf = float(array2[0]) * 9.0 / 5.0 + 32.0
-    cpu_tempf = float("{0:.2f}".format(cpu_tempf))
+    		cpu_tempc = float(array2[0])
+    		cpu_tempc = float("{0:.2f}".format(cpu_tempc))
+    		cpu_tempf = float(array2[0]) * 9.0 / 5.0 + 32.0
+    		cpu_tempf = float("{0:.2f}".format(cpu_tempf))
 
-    temp_calibrated_c = temp_c - ((cpu_tempc - temp_c)/5.466)
+    		temp_calibrated_c = temp_c - ((cpu_tempc - temp_c)/5.466)
     
 		# Format the data
 		temp_f = temp_calibrated_c * 9.0 / 5.0 + 32.0
