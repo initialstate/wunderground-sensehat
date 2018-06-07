@@ -1,4 +1,4 @@
-# wunderground-sensehat
+# Weather API (Dark Sky) + Pi Sense HAT
 ![Dashboard with Map](https://github.com/InitialState/wunderground-sensehat/wiki/img/DashboardWithMap.jpg)
 This is a hub for the Hyper-local Weather Dashboard: Weather API (Dark Sky) + Pi Sense HAT.
 
