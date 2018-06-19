@@ -105,8 +105,6 @@ def main():
 		exit()
 	else:
 		streamer = Streamer(bucket_name=BUCKET_NAME, bucket_key=BUCKET_KEY, access_key=ACCESS_KEY)
-		streamer.log(":house: Location",GPS_COORDS)
-		a = 1
 	while True:
 		# -------------- Sense Hat --------------
 		# Read the sensors
@@ -143,51 +141,56 @@ def main():
 			print "Error! Dark Sky API call failed. Skipping a reading then continuing ...\n"
 			print curr_conditions
 		else:
-			if isFloat(curr_conditions['currently']['humidity']):
+			streamer.log(":house: Location",GPS_COORDS)
+			
+			if 'humidity' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['humidity']):
 				streamer.log(":droplet: Humidity(%)", curr_conditions['currently']['humidity']*100)
 
-			if isFloat(curr_conditions['currently']['temperature']): 
+			if 'temperature' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['temperature']): 
 				streamer.log("Temperature",curr_conditions['currently']['temperature'])
 
-			if isFloat(curr_conditions['currently']['apparentTemperature']): 
+			if 'apparentTemperature' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['apparentTemperature']): 
 				streamer.log("Feels Like",curr_conditions['currently']['apparentTemperature'])
 
-			if isFloat(curr_conditions['currently']['dewPoint']):
+			if 'dewPoint' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['dewPoint']):
 				streamer.log("Dewpoint",curr_conditions['currently']['dewPoint'])
 
-			if isFloat(curr_conditions['currently']['windSpeed']):
+			if 'windSpeed' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['windSpeed']):
 				streamer.log(":dash: Wind Speed",curr_conditions['currently']['windSpeed'])
 
-			if isFloat(curr_conditions['currently']['windGust']):
+			if 'windGust' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['windGust']):
 				streamer.log(":dash: Wind Gust",curr_conditions['currently']['windGust'])
 
-			if isFloat(curr_conditions['currently']['windBearing']):
+			if 'windBearing' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['windBearing']):
 				streamer.log(":dash: Wind Direction",wind_dir_icon(curr_conditions['currently']['windBearing']))
 
-			if isFloat(curr_conditions['currently']['pressure']):
+			if 'pressure' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['pressure']):
 				streamer.log("Pressure",curr_conditions['currently']['pressure'])
 
-			if isFloat(curr_conditions['currently']['precipIntensity']):
+			if 'precipIntensity' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['precipIntensity']):
 				streamer.log(":umbrella: Precipitation Intensity",curr_conditions['currently']['precipIntensity'])
 
-			if isFloat(curr_conditions['currently']['precipProbability']):
+			if 'precipProbability' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['precipProbability']):
 				streamer.log(":umbrella: Precipitation Probabiity(%)",curr_conditions['currently']['precipProbability']*100)
 
-			if isFloat(curr_conditions['currently']['cloudCover']):
+			if 'cloudCover' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['cloudCover']):
 				streamer.log(":cloud: Cloud Cover(%)",curr_conditions['currently']['cloudCover']*100)
 
-			if isFloat(curr_conditions['currently']['uvIndex']):
+			if 'uvIndex' in curr_conditions['currently'] and isFloat(curr_conditions['currently']['uvIndex']):
 				streamer.log(":sunny: UV Index:",curr_conditions['currently']['uvIndex'])
 
-			streamer.log(":cloud: Weather Summary",curr_conditions['currently']['summary'])
+			if 'summary' in curr_conditions['currently']:
+				streamer.log(":cloud: Weather Summary",curr_conditions['currently']['summary'])
 
 			if 'hourly' in curr_conditions:
 				streamer.log("Today's Forecast",curr_conditions['hourly']['summary'])
 
 			if 'daily' in curr_conditions:
-				moon_phase = curr_conditions['daily']['data'][0]['moonPhase']
-				streamer.log(":crescent_moon: Moon Phase",moon_icon(moon_phase))
-				streamer.log(":cloud: Weather Conditions",weather_status_icon(curr_conditions['currently']['icon'],moon_phase))
+				if 'data' in curr_conditions['daily']:
+					if 'moonPhase' in curr_conditions['daily']['data'][0]:
+						moon_phase = curr_conditions['daily']['data'][0]['moonPhase']
+						streamer.log(":crescent_moon: Moon Phase",moon_icon(moon_phase))
+						streamer.log(":cloud: Weather Conditions",weather_status_icon(curr_conditions['currently']['icon'],moon_phase))
 
 			streamer.flush()
 		time.sleep(60*MINUTES_BETWEEN_READS)
