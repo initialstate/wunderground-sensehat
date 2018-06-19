@@ -60,15 +60,15 @@ def weather_icon(ds_icon):
 	icon = {
 		"clear-day"            	: ":sunny:",
 		"clear-night"           : ":new_moon_with_face:",
-		"rain"         			: ":umbrella:",
-		"snow"              	: ":snowflake:",
-		"sleet"             	: ":sweat_drops: :snowflake:",
-		"wind"     				: ":wind_blowing_face:",
-		"fog"      				: ":fog:",
-		"cloudy"     			: ":cloud:",
-		"partly-cloudy-day"		: ":partly_sunny:",
+		"rain"                  : ":umbrella:",
+		"snow"                  : ":snowflake:",
+		"sleet"                 : ":sweat_drops: :snowflake:",
+		"wind"                  : ":wind_blowing_face:",
+		"fog"                   : ":fog:",
+		"cloudy"                : ":cloud:",
+		"partly-cloudy-day"     : ":partly_sunny:",
 		"partly-cloudy-night"   : ":new_moon_with_face:",
-		"unknown"          		: ":sun_with_face:",
+		"unknown"               : ":sun_with_face:",
 	}
 	return icon.get(ds_icon,":sun_with_face:")
 
