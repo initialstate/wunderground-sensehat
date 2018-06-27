@@ -44,9 +44,9 @@ def moon_icon(moon_phase):
 		return ":waxing_crescent_moon:"
 	if moon_phase < .25:
 		return ":first_quarter_moon:"
-	if moon_phase < .5:
+	if moon_phase < .48:
 		return ":waxing_gibbous_moon:"
-	if moon_phase == .5:
+	if moon_phase < .52:
 		return ":full_moon:"
 	if moon_phase < .625:
 		return ":waning_gibbous_moon:"
